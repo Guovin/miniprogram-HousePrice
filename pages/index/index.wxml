@@ -1,4 +1,24 @@
 <!--index.wxml-->
 <view class="container">
+<view wx:for="{{province}}" wx:key="*this">{{item.name}}<button data-code="{{item.provinceCode}}" bindtap="getCity">get</button></view>
 
+<block wx:for="{{city}}" wx:key="*this">
+<view>
+  {{item.name}}
+  <button data-city-code="{{item.cityCode}}" bindtap="getMonthPrice">month</button>
+  <button data-city-code="{{item.cityCode}}" bindtap="getYearPrice">year</button>
+</view>
+</block>
+
+<block wx:for="{{monthPrice}}" wx:key="*this">
+<view>
+  价格：{{item.cityPrice}}---时间：{{item.priceDate}}
+</view>
+</block>
+
+<block wx:for="{{yearPrice}}" wx:key="*this">
+<view>
+  价格：{{item}}---时间：{{index}}
+</view>
+</block>
 </view>
