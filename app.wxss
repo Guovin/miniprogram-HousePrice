@@ -7,4 +7,6 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
+  background-color: rgba(244, 248, 248, 0.993);
+  height: 100vh;
 } 
