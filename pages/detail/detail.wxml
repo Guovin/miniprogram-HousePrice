@@ -1,13 +1,55 @@
 <!--pages/detail/detail.wxml-->
 <view class="container">
-  <button bindtap="addContrast">添加对比</button>
-  <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}"></ec-canvas>
-  <view class="section">
-  <view class="section__title">多列选择器</view>
+<!-- 对比选择 -->
+<view class="section">
   <picker mode="multiSelector" bindchange="bindMultiPickerChange" bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}" range-key="{{'name'}}">
     <view class="picker">
-      当前选择：{{multiArray[0][multiIndex[0]]}}，{{multiArray[1][multiIndex[1]]}}
+      添加对比
     </view>
   </picker>
 </view>
+
+<!-- 折线图区域 -->
+<view class="line_canvas">
+  <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}"></ec-canvas>
+  <!-- 时间区间选择区域 -->
+  <view class="time_type">
+    <view class="time_change {{timeType=='twoMonths'?'select_blue':''}}" data-type="twoMonths" bindtap="clickTimeType">近1月</view>
+    <view class="time_change {{timeType=='threeMonths'?'select_blue':''}}" data-type="threeMonths" bindtap="clickTimeType">近3月</view>
+    <view class="time_change {{timeType=='sixMonths'?'select_blue':''}}" data-type="sixMonths" bindtap="clickTimeType">近6月</view>
+    <view class="time_change {{timeType=='oneYear'?'select_blue':''}}" data-type="oneYear" bindtap="clickTimeType">近1年</view>
+    <view class="time_change {{timeType=='twoYears'?'select_blue':''}}" data-type="twoYears" bindtap="clickTimeType">近2年</view>
+    <view class="time_change {{timeType=='threeYears'?'select_blue':''}}" data-type="threeYears" bindtap="clickTimeType">近3年</view>
+  </view>
+  <!-- 具体数据区域 -->
+<view class="detail_card">
+  <view class="title">具体表现</view>
+  <view class="detail_info">
+  <view class="left_title">
+  <view class="city_title">城市：</view>
+  <view class="new_price">最新房价：</view>
+  <view class="change">近1月：</view>
+  <view class="change">近3月：</view>
+  <view class="change">近6月：</view>
+  <view class="change">近1年：</view>
+  <view class="change">近2年：</view>
+  <view class="change">近3年：</view>
+  </view>
+  <block wx:for="{{result}}" wx:key="*this">
+  <view class="right_content">
+  <view class="city_name" style="color:{{item[0]}}">{{item[1]}}</view>
+  <view class="price">{{item[2].cityPrice}}元/m²</view>
+  <view class="percent {{item[3]>0?'up_red':'down_green'}}">{{item[3]}}%</view>
+  <view class="percent {{item[4]>0?'up_red':'down_green'}}">{{item[4]}}%</view>
+  <view class="percent {{item[5]>0?'up_red':'down_green'}}">{{item[5]}}%</view>
+  <view class="percent {{item[6]>0?'up_red':'down_green'}}">{{item[6]}}%</view>
+  <view class="percent {{item[7]>0?'up_red':'down_green'}}">{{item[7]}}%</view>
+  <view class="percent {{item[8]>0?'up_red':'down_green'}}">{{item[8]}}%</view>
+  </view>
+</block>
+</view>
+</view>
+</view>
+
+
 </view>
