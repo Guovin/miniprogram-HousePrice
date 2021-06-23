@@ -1,7 +1,7 @@
 /* pages/detail/detail.wxss */
 .line_canvas{
   width: 95%;
-  height: 50%;
+  height: 60%;
   position:absolute;
 }
 
@@ -20,7 +20,7 @@ ec-canvas {
   z-index: 999;
   font-size: 25rpx;
   color: rgb(55, 56, 56);
-  border-radius: 10rpx;
+  border-radius: 8rpx;
   background-color: rgb(232, 238, 240);
   box-shadow: rgb(226, 221, 221) 4rpx 4rpx 15rpx;
 }
@@ -40,15 +40,15 @@ ec-canvas {
   display:flex;
   justify-content: space-around;
   position: relative;
-  top: -18%;
+  top: -15%;
 }
 
 .time_change{
   width: 15%;
-  background-color: rgb(220, 228, 235);
+  background-color: rgb(232, 238, 240);
   box-shadow: rgb(226, 221, 221) 4rpx 4rpx 15rpx;
-  border-radius: 10rpx;
-  margin-bottom: 10rpx;
+  border-radius: 8rpx;
+  margin-top: 10rpx;
   text-align: center;
   color: rgb(55, 56, 56);
 }
@@ -60,12 +60,12 @@ ec-canvas {
 .detail_info{
   display: flex;
   justify-content: space-between;
-  margin-top: 15rpx;
+  margin-top: 10rpx;
+  padding: 0 6rpx 6rpx 6rpx;
 }
 
 .left_title{
-  width: 21%;
-  margin-left: 6rpx;
+  width: 25%;
 }
 
 .change,.city_title,.new_price{
@@ -92,9 +92,29 @@ ec-canvas {
   font-size: 35rpx;
   font-weight: bold;
   margin-top: 6rpx;
+  color: #504e4e;
 }
 
 .price{
   font-weight: bold;
+}
+
+.delete{
+  position: relative;
+  display: inline-block;
+  top: -20rpx;
+  right: 8rpx;
+  width: 25rpx;
+  height: 25rpx;
+  line-height: 25rpx;
+  text-align: center;
+  border-radius: 50%;
+  background-color: rgba(2, 2, 2,0.3);
+  color: rgb(255, 255, 255);
+  font-size: 16rpx;
+}
+
+.one_detail{
+  width: 75%;
 }
 

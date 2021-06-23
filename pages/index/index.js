@@ -141,6 +141,12 @@ Page({
       },
       success(res){
         // 获取城市名称与价格跌涨
+        if(res.data.code == 400){
+          wx.showToast({
+            title: '访问过于频繁',
+            icon: 'error'
+          })
+        }
         let beforePrice = res.data.data.info[0].cityPrice
         let nowPrice = res.data.data.info[1].cityPrice
         let cityName = that.getCityName(code)

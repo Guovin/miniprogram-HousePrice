@@ -65,7 +65,7 @@ var option = {
 
     type: 'category',
 
-    name: '时间',//横坐标名称
+    name: '',//横坐标名称
 
     nameTextStyle: {//在name值存在下，设置name的样式
 
@@ -114,7 +114,7 @@ var option = {
 
     position:'left',
 
-    name: '价格',//纵坐标名称
+    name: '',//纵坐标名称
 
     nameTextStyle:{//在name值存在下，设置name的样式
 
@@ -226,6 +226,36 @@ var option = {
           xLable.push('60K');
 
         }
+        if (value == 70000) {
+
+          xLable.push('70K');
+
+        }
+        if (value == 80000) {
+
+          xLable.push('80K');
+
+        }
+        if (value == 90000) {
+
+          xLable.push('90K');
+
+        }
+        if (value == 100000) {
+
+          xLable.push('100K');
+
+        }
+        if (value == 110000) {
+
+          xLable.push('110K');
+
+        }
+        if (value == 120000) {
+
+          xLable.push('120K');
+
+        }
 
         return xLable
 
@@ -276,8 +306,6 @@ Page({
     },
     // 城市名称
     cityName:[],
-    // 当前y轴最大值
-    max:0,
     multiArray: [[{name: "广东", provinceCode: "guangdong"},{name: "北京", provinceCode: "beijing"},{name: "上海", provinceCode: "shanghai"},{name: "重庆", provinceCode: "chongqin"},{name: "天津", provinceCode: "tianjin"},{name: "浙江", provinceCode: "zhejiang"},{name: "江苏", provinceCode: "jiangsu"},{name: "湖北", provinceCode: "hubei"},{name: "四川", provinceCode: "sichuang"},{name: "山东", provinceCode: "shandong"},{name: "安徽", provinceCode: "anhui"},{name: "湖南", provinceCode: "hunan"}],[{name: "广州", cityCode: "guangzhou", provinceCode: "guangdong"},{name: "佛山", cityCode: "foshan", provinceCode: "guangdong"},{name: "东莞", cityCode: "dongguan", provinceCode: "guangdong"},{name: "中山", cityCode: "zhongshan", provinceCode: "guangdong"},{name: "惠州", cityCode: "huizhou", provinceCode: "guangdong"},{name: "江门", cityCode: "jiangmen", provinceCode: "guangdong"},{name: "珠海", cityCode: "zhuhai", provinceCode: "guangdong"},{name: "肇庆", cityCode: "zhaoqing", provinceCode: "guangdong"},{name: "深圳", cityCode: "shenzhen", provinceCode: "guangdong"}]],
     multiIndex: [0, 0],
     selectCity:[],
@@ -288,31 +316,51 @@ Page({
     twoYears:[],
     threeYears:[],
     timeType:'oneYear',
-    result:[]
+    result:[],
+    max:0,
+    yMaxHistory:[]
 },
 
 // 选择确认触发事件
 bindMultiPickerChange: function (e) {
+  // 判断是否已经存在该城市,避免重复添加
   let code = this.data.selectCity[0].cityCode
-  let name = this.data.selectCity[0].name
-  this.setData({
-    multiIndex: e.detail.value
+  let codeList = this.data.code
+  let isOk = true
+  codeList.forEach((item)=>{
+    if(item == code){
+      wx.showToast({
+        title: '已存在该城市',
+        icon: 'error'
+      })
+      return isOk = false
+    }
   })
-  let color = '#' + Math.floor(Math.random() * 0xffffff).toString(16)
-  this.addContrast(code,name,color)
+  if(isOk == true){
+    let name = this.data.selectCity[0].name
+    this.setData({
+      multiIndex: e.detail.value
+    })
+    let color = '#' + Math.floor(Math.random() * 0xffffff).toString(16)
+    this.addContrast(code,name,color)
+  }else{
+    wx.showToast({
+      title: '已存在该城市',
+      icon: 'error'
+    })
+  }
 },
 
 // 进入选择时滑动触发
 bindMultiPickerColumnChange: function (e) {
   let code = this.data.multiArray[0][e.detail.value].provinceCode
-  let cityInfo = []
   // 切换省份时更新城市信息
+  var data = {
+    multiArray: this.data.multiArray,
+    multiIndex: this.data.multiIndex
+  };
   if(e.detail.column == 0){
     this.getCity(code).then((res)=>{
-      var data = {
-        multiArray: this.data.multiArray,
-        multiIndex: this.data.multiIndex
-      };
       data.multiIndex[e.detail.column] = e.detail.value;
       if(res == undefined){
         data.multiArray[1] = [{name:'无'}]
@@ -326,8 +374,27 @@ bindMultiPickerColumnChange: function (e) {
   }
   // 获取当前选定的城市
   else if(e.detail.column == 1 ){
+    let cityInfo = []
     cityInfo.push(this.data.multiArray[1][e.detail.value])
+    data.multiIndex[e.detail.column] = e.detail.value;
     this.setData({selectCity:cityInfo})
+    this.setData(data)
+  }
+},
+
+// 点击添加对比触发事件
+clickPicker(){
+  // 处理未滑动选择，直接确认时的事件
+  let indexList = this.data.multiIndex
+  let newSelectCity = this.data.selectCity
+  if(indexList[0] == 0 && indexList[1] == 0 && newSelectCity.length == 0){
+    // 未滑动选择，默认选择第一个广东-广州
+    // 避免用户可能已经删除已经存在的广州数据，需要重新获取
+    this.getCity('guangdong').then((res)=>{
+      let cityInfo = res[0]
+      newSelectCity.push(cityInfo)
+      this.setData({selectCity:newSelectCity})
+    })
   }
 },
 
@@ -387,7 +454,9 @@ async drawLine(code,name,color,type,flag){
     })
     let maxInteger = parseInt(maxList.join(""))
     if(maxInteger > that.data.max){
-      that.setData({max:maxInteger})
+      let yMaxList = that.data.yMaxHistory
+      yMaxList.push(maxInteger * 2)
+      that.setData({yMaxHistory:yMaxList,max:maxInteger})
       option.yAxis.max = maxInteger * 2
     }
     let yData = {
@@ -459,9 +528,9 @@ async drawLine(code,name,color,type,flag){
 
 // 添加城市进行对比
 addContrast(code,name,color){
+  let codeList = this.data.code
   let type = this.data.timeType
   let num  = this.data.listNum
-  let codeList = this.data.code
   let colorList = this.data.color
   let cityNameList = this.data.cityName
   if(option.series.length < 3 ){
@@ -708,22 +777,78 @@ clickTimeType(event){
 
 // 具体表现数据处理
 detailShow(){
-  let resultList = this.data.result
-  let i = this.data.listNum - 1
-  // 两月增幅
-  let twoMonthsPercent = (((this.data.twoMonths[i][1].cityPrice - this.data.twoMonths[i][0].cityPrice)/(this.data.twoMonths[i][1].cityPrice + this.data.twoMonths[i][0].cityPrice)) * 100).toFixed(2)
-  // 三月增幅
-  let threeMonthsPercent = (((this.data.threeMonths[i][2].cityPrice - this.data.threeMonths[i][0].cityPrice)/(this.data.threeMonths[i][2].cityPrice + this.data.threeMonths[i][0].cityPrice)) * 100).toFixed(2)
-  // 6月增幅
-  let sixMonthsPercent = (((this.data.sixMonths[i][5].cityPrice - this.data.sixMonths[i][0].cityPrice)/(this.data.sixMonths[i][5].cityPrice + this.data.sixMonths[i][0].cityPrice)) * 100).toFixed(2)
-  // 1年增幅
-  let oneYearPercent = (((this.data.oneYear[i][11].cityPrice - this.data.oneYear[i][0].cityPrice)/(this.data.oneYear[i][11].cityPrice + this.data.oneYear[i][0].cityPrice)) * 100).toFixed(2)
-  // 2年增幅
-  let twoYearsPercent = (((this.data.twoYears[i][23].cityPrice - this.data.twoYears[i][0].cityPrice)/(this.data.twoYears[i][23].cityPrice + this.data.twoYears[i][0].cityPrice)) * 100).toFixed(2)
-  // 3年增幅
-  let threeYearsPercent = (((this.data.threeYears[i][35].cityPrice - this.data.threeYears[i][0].cityPrice)/(this.data.threeYears[i][35].cityPrice + this.data.threeYears[i][0].cityPrice)) * 100).toFixed(2)
-  resultList.push([this.data.color[i],this.data.cityName[i],this.data.twoMonths[i][1],twoMonthsPercent,threeMonthsPercent,sixMonthsPercent,oneYearPercent,twoYearsPercent,threeYearsPercent])
-  this.setData({result:resultList})
+  wx.hideLoading({
+    success: (res) => {
+      let resultList = this.data.result
+      let i = this.data.listNum - 1
+      // 两月增幅
+      let twoMonthsPercent = (((this.data.twoMonths[i][1].cityPrice - this.data.twoMonths[i][0].cityPrice)/(this.data.twoMonths[i][1].cityPrice + this.data.twoMonths[i][0].cityPrice)) * 100).toFixed(2)
+      // 三月增幅
+      let threeMonthsPercent = (((this.data.threeMonths[i][2].cityPrice - this.data.threeMonths[i][0].cityPrice)/(this.data.threeMonths[i][2].cityPrice + this.data.threeMonths[i][0].cityPrice)) * 100).toFixed(2)
+      // 6月增幅
+      let sixMonthsPercent = (((this.data.sixMonths[i][5].cityPrice - this.data.sixMonths[i][0].cityPrice)/(this.data.sixMonths[i][5].cityPrice + this.data.sixMonths[i][0].cityPrice)) * 100).toFixed(2)
+      // 1年增幅
+      let oneYearPercent = (((this.data.oneYear[i][11].cityPrice - this.data.oneYear[i][0].cityPrice)/(this.data.oneYear[i][11].cityPrice + this.data.oneYear[i][0].cityPrice)) * 100).toFixed(2)
+      // 2年增幅
+      let twoYearsPercent = (((this.data.twoYears[i][23].cityPrice - this.data.twoYears[i][0].cityPrice)/(this.data.twoYears[i][23].cityPrice + this.data.twoYears[i][0].cityPrice)) * 100).toFixed(2)
+      // 3年增幅
+      let threeYearsPercent = (((this.data.threeYears[i][35].cityPrice - this.data.threeYears[i][0].cityPrice)/(this.data.threeYears[i][35].cityPrice + this.data.threeYears[i][0].cityPrice)) * 100).toFixed(2)
+      resultList.push([this.data.color[i],this.data.cityName[i],this.data.twoMonths[i][1],twoMonthsPercent,threeMonthsPercent,sixMonthsPercent,oneYearPercent,twoYearsPercent,threeYearsPercent])
+      this.setData({result:resultList})
+    },
+  })
+},
+
+// 删除已经获取的城市记录
+deleteCity(e){
+  // 获取该城市索引
+  let index = e.currentTarget.dataset.city
+  // 获取数据数组
+  let newCityName = this.data.cityName
+  let newColor = this.data.color
+  let newTwoMonths = this.data.twoMonths
+  let newThreeMonths = this.data.threeMonths
+  let newSixMonths = this.data.sixMonths
+  let newOneYear = this.data.oneYear
+  let newTwoYears = this.data.twoYears
+  let newThreeYears = this.data.threeYears
+  let newListNum = this.data.listNum
+  let newCode = this.data.code
+  let newYMaxList = this.data.yMaxHistory
+  let newMax = this.data.max
+  // 删除本地数据
+  newCityName.splice(index,1)
+  newColor.splice(index,1)
+  newTwoMonths.splice(index,1)
+  newThreeMonths.splice(index,1)
+  newSixMonths.splice(index,1)
+  newOneYear.splice(index,1)
+  newTwoYears.splice(index,1)
+  newThreeYears.splice(index,1)
+  newListNum -= 1
+  newCode.splice(index,1)
+  newYMaxList.splice(index,1)
+  newMax = newYMaxList[newYMaxList.length - 1]
+  if(newMax == undefined){
+    newMax = 0
+  }
+  // 删除已经显示到数据
+  let showResult = this.data.result
+  showResult.splice(index,1)
+  // 保存
+  this.setData({cityName:newCityName,color:newColor,twoMonths:newTwoMonths,threeMonths:newThreeMonths,sixMonths:newSixMonths,oneYear:newOneYear,twoYears:newTwoYears,threeYears:newThreeYears,listNum:newListNum,result:showResult,code:newCode,yMaxHistory:newYMaxList,max:newMax})
+  // 重新绘制折线图
+  option.color = newColor
+  option.series.splice(index,1)
+  option.legend.data.slice(index,1)
+  let echartsComponnet = this.selectComponent("#mychart-dom-bar")
+    echartsComponnet.init((canvas, width, height) => {
+    const chart = echarts.init(canvas, null, {
+      width: width,
+      height: height
+    });
+    chart.setOption(option)
+  })
 },
 
   /**
@@ -734,6 +859,9 @@ detailShow(){
     let cityNameList = [options.name]
     let num = 1
     //获取近一年的城市房价数据用于绘制折线图
+    wx.showLoading({
+      title: '获取中',
+    })
     this.drawLine(options.code,options.name,'#44B2FB','oneYear',false)
     this.setData({code:codeList,cityName:cityNameList,listNum:num})
     let that = this

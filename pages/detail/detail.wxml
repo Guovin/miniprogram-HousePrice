@@ -1,8 +1,8 @@
 <!--pages/detail/detail.wxml-->
 <view class="container">
 <!-- 对比选择 -->
-<view class="section">
-  <picker mode="multiSelector" bindchange="bindMultiPickerChange" bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}" range-key="{{'name'}}">
+<view class="section" wx:if="{{result[0] != undefined}}">
+  <picker mode="multiSelector" bindchange="bindMultiPickerChange" bindcolumnchange="bindMultiPickerColumnChange" bindtap="clickPicker" value="{{multiIndex}}" range="{{multiArray}}" range-key="{{'name'}}">
     <view class="picker">
       添加对比
     </view>
@@ -13,7 +13,7 @@
 <view class="line_canvas">
   <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}"></ec-canvas>
   <!-- 时间区间选择区域 -->
-  <view class="time_type">
+  <view class="time_type" wx:if="{{result[0] != undefined}}">
     <view class="time_change {{timeType=='twoMonths'?'select_blue':''}}" data-type="twoMonths" bindtap="clickTimeType">近1月</view>
     <view class="time_change {{timeType=='threeMonths'?'select_blue':''}}" data-type="threeMonths" bindtap="clickTimeType">近3月</view>
     <view class="time_change {{timeType=='sixMonths'?'select_blue':''}}" data-type="sixMonths" bindtap="clickTimeType">近6月</view>
@@ -22,7 +22,8 @@
     <view class="time_change {{timeType=='threeYears'?'select_blue':''}}" data-type="threeYears" bindtap="clickTimeType">近3年</view>
   </view>
   <!-- 具体数据区域 -->
-<view class="detail_card">
+<view class="detail_card" wx:if="{{result[0] != undefined}}">
+<!-- 左侧标题 -->
   <view class="title">具体表现</view>
   <view class="detail_info">
   <view class="left_title">
@@ -36,8 +37,13 @@
   <view class="change">近3年：</view>
   </view>
   <block wx:for="{{result}}" wx:key="*this">
-  <view class="right_content">
-  <view class="city_name" style="color:{{item[0]}}">{{item[1]}}</view>
+  <!-- 右侧查询数据 -->
+  <view class="right_content {{result[1] == undefined?'one_detail':''}}">
+  <view class="city_name" style="color:{{item[0]}}">
+  {{item[1]}}
+  <!-- 删除按钮 -->
+  <view class="delete" bindtap="deleteCity" data-city="{{index}}" wx:if="{{result[1] != undefined}}">✕</view>
+  </view>
   <view class="price">{{item[2].cityPrice}}元/m²</view>
   <view class="percent {{item[3]>0?'up_red':'down_green'}}">{{item[3]}}%</view>
   <view class="percent {{item[4]>0?'up_red':'down_green'}}">{{item[4]}}%</view>
