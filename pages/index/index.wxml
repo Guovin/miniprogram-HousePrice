@@ -1,5 +1,39 @@
 <!--index.wxml-->
 <view class="container">
+<!-- 城市搜索 -->
+<view class="search_container">
+<view class="section">
+  <picker mode="multiSelector" bindchange="bindMultiPickerChange" bindcolumnchange="bindMultiPickerColumnChange" bindtap="clickPicker" value="{{multiIndex}}" range="{{multiArray}}" range-key="{{'name'}}">
+    <view class="city_search">
+      🔍 查询城市房价
+    </view>
+  </picker>
+</view>
+</view>
+
+<!-- 折线图区域 -->
+<view class="line_canvas" wx:if="{{tenYears[0] != undefined}}">
+  <ec-canvas id="mychart-dom-index" canvas-id="mychart_index" ec="{{ ec }}"></ec-canvas>
+</view>
+
+<!-- 简介卡片 -->
+<view class="card_container">
+<block wx:for="{{cardInfo}}" wx:key="value">
+<view class="card" bindtap="goDetail" data-code="{{item[0].value}}" data-name="{{item[0].key}}">
+<view class="left">
+  <view class="title">{{item[0].key}}</view>
+  <view class="nowPrice">{{item[1].value}}元/m²</view>
+  <view class="spanPrice" style="color:red" wx:if="{{item[1].value - item[1].key > 0}}">▲{{item[2]}}%</view>
+  <view class="spanPrice" style="color:blue" wx:if="{{item[1].value - item[1].key == 0}}">持平</view>
+  <view class="spanPrice" style="color:green" wx:if="{{item[1].value - item[1].key < 0}}">▼{{item[2]}}%</view>
+</view>
+  <view class="right">
+  ›
+  </view>
+</view>
+</block>
+</view>
+
 <!-- <view wx:for="{{province}}" wx:key="provinceCode">{{item.name}}<button data-code="{{item.provinceCode}}" bindtap="getCity">get</button></view>
 
 <block wx:for="{{city}}" wx:key="cityCode">
@@ -21,19 +55,6 @@
   价格：{{item}}---时间：{{index}}
 </view>
 </block> -->
-
-<!-- 简介卡片 -->
-<block wx:for="{{cardInfo}}" wx:key="*this">
-<view class="card" bindtap="goDetail" data-code="{{item[0].value}}">
-  <view class="title">{{item[0].key}}</view>
-  <view class="right">
-  <view class="nowPrice">{{item[1].value}}元/m²</view>
-  <view class="spanPrice" style="color:red" wx:if="{{item[1].value - item[1].key > 0}}">⬆{{item[1].value - item[1].key}}元</view>
-  <view class="spanPrice" style="color:blue" wx:if="{{item[1].value - item[1].key == 0}}">——</view>
-  <view class="spanPrice" style="color:green" wx:if="{{item[1].value - item[1].key < 0}}">⬇{{item[1].value - item[1].key}}元</view>
-  </view>
-</view>
-</block>
 
 <!-- 选择开始的月份 -->
 <!-- <picker-view value="{{value}}" indicator-style="height: 50rpx;" style="width: 100%; height: 300rpx;" bindchange="selectStartMonth">
